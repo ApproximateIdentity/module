@@ -2,6 +2,7 @@
 #include <structmember.h>
 
 #include <stdio.h>
+#include <fast_print.h>
 
 
 static PyObject* KError;
@@ -97,10 +98,13 @@ kprint_strings(kobject* self, PyObject* args) {
             return NULL;
         }
     }
+    const char** strings = malloc((PyList_Size(lobj) + 1) + sizeof(const char*));
     for (unsigned int i = 0; i < PyList_Size(lobj); ++i) {
-        const char* s = PyString_AsString(PyList_GetItem(lobj, i));
-        printf("%s\n", s);
+        *(strings + i) = PyString_AsString(PyList_GetItem(lobj, i));
     }
+    *(strings + PyList_Size(lobj)) = NULL;
+    fast_print_strings(strings);
+    free(strings);
     Py_RETURN_NONE;
 }
 

@@ -11,6 +11,7 @@ EXTRA_COMPILE_ARGS = ['-g', '-std=c99']
 MYMODULE = Extension(
     'module.module',
     sources=SOURCES,
+    libraries=['fast_print'],
     extra_compile_args=EXTRA_COMPILE_ARGS)
 
 setup(
