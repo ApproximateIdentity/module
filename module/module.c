@@ -2,9 +2,32 @@
 #include <structmember.h>
 
 
+static PyObject* KError;
+
 typedef struct {
     PyObject_HEAD
+    int i;
 } kobject;
+
+static void
+kdealloc(kobject* self) {
+    self->i = -1;
+    self->ob_type->tp_free((PyObject*)self);
+}
+
+static int
+kinit(kobject* self, PyObject* args, PyObject* kwds) {
+    int i = -1;
+    if (!PyArg_ParseTuple(args, "i", &i)) {
+        return -1;
+    }
+    if (i < 0) {
+        PyErr_SetString(KError, "Must pass in non-negative int!");
+        return -1;
+    }
+    self->i = i;
+    return 0;
+}
 
 static PyMethodDef KlassMethods[] = {
     {NULL, NULL, 0, NULL}        /* Sentinel */
@@ -16,7 +39,7 @@ static PyTypeObject KlassType = {
     "module.klass",             /*tp_name*/
     sizeof(kobject), /*tp_basicsize*/
     0,                         /*tp_itemsize*/
-    0,                         /*tp_dealloc*/
+    (destructor)kdealloc,                         /*tp_dealloc*/
     0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
@@ -47,7 +70,7 @@ static PyTypeObject KlassType = {
     0,                         /* tp_descr_get */
     0,                         /* tp_descr_set */
     0,                         /* tp_dictoffset */
-    0,      /* tp_init */
+    (initproc)kinit,      /* tp_init */
     0,                         /* tp_alloc */
     0,                 /* tp_new */
 };
@@ -71,4 +94,8 @@ initmodule(void)
     }
     Py_INCREF(&KlassType);
     PyModule_AddObject(m, "Klass", (PyObject *)&KlassType);
+
+    KError = PyErr_NewException("module.KError", NULL, NULL);
+    Py_INCREF(KError);
+    PyModule_AddObject(m, "KError", KError);
 }
