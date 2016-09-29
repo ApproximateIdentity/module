@@ -85,7 +85,28 @@ static PyTypeObject KlassType = {
     0,                 /* tp_new */
 };
 
+static PyObject*
+kprint_strings(kobject* self, PyObject* args) {
+    PyObject* lobj;
+    if (!PyArg_ParseTuple(args, "O!", &PyList_Type, &lobj)) {
+        return NULL;
+    }
+    for (unsigned int i = 0; i < PyList_Size(lobj); ++i) {
+        if (!PyString_Check(PyList_GetItem(lobj, i))) {
+            PyErr_SetString(PyExc_TypeError, "Must pass in list of strings!");
+            return NULL;
+        }
+    }
+    for (unsigned int i = 0; i < PyList_Size(lobj); ++i) {
+        const char* s = PyString_AsString(PyList_GetItem(lobj, i));
+        printf("%s\n", s);
+    }
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef ModuleMethods[] = {
+    {"print_strings", kprint_strings, METH_VARARGS,
+     "Print content of a list of strings."},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
