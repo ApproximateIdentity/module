@@ -1,6 +1,8 @@
 #include <Python.h>
 #include <structmember.h>
 
+#include <stdio.h>
+
 
 static PyObject* KError;
 
@@ -11,12 +13,14 @@ typedef struct {
 
 static void
 kdealloc(kobject* self) {
+    printf("calling kdealloc\n");
     self->i = -1;
     self->ob_type->tp_free((PyObject*)self);
 }
 
 static int
 kinit(kobject* self, PyObject* args, PyObject* kwds) {
+    printf("calling kinit\n");
     int i = -1;
     if (!PyArg_ParseTuple(args, "i", &i)) {
         return -1;
