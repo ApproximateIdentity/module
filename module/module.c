@@ -33,7 +33,13 @@ kinit(kobject* self, PyObject* args, PyObject* kwds) {
     return 0;
 }
 
+static PyObject*
+kid(kobject* self) {
+    return PyInt_FromLong(self->i);
+}
+
 static PyMethodDef KlassMethods[] = {
+    {"id", kid, METH_NOARGS, "Get id of class."},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
