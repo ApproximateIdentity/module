@@ -100,7 +100,9 @@ kprint_strings(PyObject* self, PyObject* args) {
         }
         strings.push_back(PyString_AsString(PyList_GetItem(lobj, i)));
     }
+    Py_BEGIN_ALLOW_THREADS
     fast_print_strings(strings);
+    Py_END_ALLOW_THREADS
     Py_RETURN_NONE;
 }
 
