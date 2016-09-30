@@ -2,7 +2,7 @@
 #include <structmember.h>
 
 #include <stdio.h>
-#include <fast_print.h>
+#include <fast_print.hpp>
 
 
 static PyObject* KError;
@@ -35,8 +35,8 @@ kinit(kobject* self, PyObject* args, PyObject* kwds) {
 }
 
 static PyObject*
-kid(kobject* self) {
-    return PyInt_FromLong(self->i);
+kid(PyObject* self, PyObject* _) {
+    return PyInt_FromLong(((kobject*)self)->i);
 }
 
 static PyMethodDef KlassMethods[] = {
@@ -87,24 +87,20 @@ static PyTypeObject KlassType = {
 };
 
 static PyObject*
-kprint_strings(kobject* self, PyObject* args) {
+kprint_strings(PyObject* self, PyObject* args) {
     PyObject* lobj;
     if (!PyArg_ParseTuple(args, "O!", &PyList_Type, &lobj)) {
         return NULL;
     }
+    std::vector<std::string> strings;
     for (unsigned int i = 0; i < PyList_Size(lobj); ++i) {
         if (!PyString_Check(PyList_GetItem(lobj, i))) {
             PyErr_SetString(PyExc_TypeError, "Must pass in list of strings!");
             return NULL;
         }
+        strings.push_back(PyString_AsString(PyList_GetItem(lobj, i)));
     }
-    const char** strings = malloc((PyList_Size(lobj) + 1) + sizeof(const char*));
-    for (unsigned int i = 0; i < PyList_Size(lobj); ++i) {
-        *(strings + i) = PyString_AsString(PyList_GetItem(lobj, i));
-    }
-    *(strings + PyList_Size(lobj)) = NULL;
     fast_print_strings(strings);
-    free(strings);
     Py_RETURN_NONE;
 }
 

@@ -1,20 +1,15 @@
 import os
 from setuptools import setup, Extension
 
-DISTNAME = 'module'
 
-PACKAGES = ['module']
-
-SOURCES = [os.path.join("module", "module.c")]
-EXTRA_COMPILE_ARGS = ['-g', '-std=c99']
-
-MYMODULE = Extension(
+MODULE_EXT = Extension(
     'module.module',
-    sources=SOURCES,
+    sources=[os.path.join("module", "module.cpp")],
     libraries=['fast_print'],
-    extra_compile_args=EXTRA_COMPILE_ARGS)
+    extra_compile_args=['-g', '-std=c++1y'],
+    language='c++')
 
 setup(
-    name=DISTNAME,
-    packages=PACKAGES,
-    ext_modules = [MYMODULE])
+    name='module',
+    packages=['module'],
+    ext_modules = [MODULE_EXT])
