@@ -1,9 +1,26 @@
-all:
-	g++ -g -shared -Iinclude -fPIC -std=c++1y src/fast_print.cpp -o libfast_print.so
+so = libfast_print.so
+soname = -lfast_print
 
-test: all
-	g++ -g -L. -std=c++1y -Iinclude -o test test.cpp -lfast_print
-	LD_LIBRARY_PATH=$(PWD) ./test
+cxx = g++
+cxxflags = -std=c++1y -g -O3 -fPIC -Wall -Wextra -Wfatal-errors -pedantic-errors
+includedirs = -Iinclude
+libdirs = -L.
+ldflags = -shared -Wl,-soname,$(so)
+
+srcs = $(wildcard src/*.cpp)
+objs = $(patsubst %.cpp,%.o,$(srcs))
+
+all: $(so)
+
+$(so): $(objs)
+	$(cxx) $(libdirs) $(ldflags) $(objs) -o $(so) $(libs)
+
+%.o:%.cpp
+	$(cxx) $(cxxflags) $(includedirs) -c -o $@ $<
 
 clean:
-	rm -f *.so test src/*.o
+	rm -f *.o src/*.o *.so lib/*.so test
+
+test: all
+	$(cxx) $(cxxflags) $(includedirs) $(libdirs) -o test test.cpp $(soname)
+	LD_LIBRARY_PATH=$(PWD) ./test
